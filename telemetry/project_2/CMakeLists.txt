@@ -5,26 +5,43 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-pthread -O0 -g -w")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O0 -g -w")
+
+# Set the C++ compiler (g++.exe) path
+set(CMAKE_CXX_COMPILER "C:/msys64/ucrt64/bin/g++.exe")
+
+# Set the C compiler (gcc.exe) path
+set(CMAKE_C_COMPILER "C:/msys64/ucrt64/bin/gcc.exe")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
-    # ${CMAKE_CURRENT_SOURCE_DIR}/other/dirs
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_library(
-    ${PROJECT_NAME}
-    SHARED
-    
-    # Sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/fake_receiver.c
+# List of source files
+set(SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fake_receiver.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/reader.cpp
 )
 
+#Compile every source file as C++
+set_source_files_properties(
+    ${SOURCE_FILES}
+    PROPERTIES LANGUAGE CXX
+)
+
+
+# Create a library from the source files
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+
+# Add any other libraries you need to link against here
 target_link_libraries(${PROJECT_NAME}
-    # Other librs
+    #Other libs
 )
 
+# Set the output directory for the executable
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-add_executable(project_2 main.cpp)
+# Create the executable and link it against your library
+add_executable(project_2 ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 target_link_libraries(project_2 ${PROJECT_NAME})
