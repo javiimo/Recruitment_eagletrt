@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <iostream>
-#include "include/reader.h"
-#include "include/parser.h"
+#include "../include/parser.h"
+#include "../include/reader.h"
 #include <string>
 #include <deque>
 #include <vector>
@@ -21,8 +21,14 @@ deque<vector<TMessage>> data_stored;
 mutex gLock;
 
 
-int main(void){
-    const char* path = "candump.log";
+int main(int argc, char* argv[]){
+    // Check if an argument is provided
+    if (argc != 2) {
+        cerr << "Usage: " << argv[0] << " <path_to_file>" << endl;
+        return 1;
+    }
+
+    const char* path = argv[1];
     cout << "Welcome to Project 2" << endl;
     cout << "Press any button to stop receiving info" << endl;
 
@@ -35,17 +41,20 @@ int main(void){
     //Start a writer thread
 
     // Start a thread to check input to stop reading
+    // To stop the thread you would have to press a key and then press enter.
     thread inputThread([&stopr_flag]() {
         string input;
+        cout << "Input Thread started" << endl;
         while (true) {
             cin >> input;
             if (!input.empty()) {
                 stopr_flag.store(true); // Signal the reader thread to stop.
+                cout << "STOP READER" << endl;
                 break;
             }
         }});
     
-    cout << "Finished!!" << endl;
+    cout << "Finished Main!!" << endl;
     readerThread.join();
     inputThread.join();
     return 0;
