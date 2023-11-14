@@ -52,36 +52,31 @@ int main(int argc, char* argv[]){
     // To stop the thread you would have to press a key and then press enter.
     thread inputThread([&stopr_flag]() {
         string input;
-        cout << "Input Thread started" << endl;
         while (true) {
             cin >> input;
             if (!input.empty()) {
                 stopr_flag.store(true); // Signal the reader thread to stop.
-                cout << "STOP READER" << endl;
+                cout << "STOP SIGNALED" << endl;
                 break;
             }
         }});
     
     //Compute some basic statistics
-    cout << "Main thread started" << endl;
     while(true) {
-        cout << "Main thread waits" << endl;
         {
             unique_lock<mutex> lock(mtx);
             cv.wait(lock, [&]{ return dataAvailablem || !writing.load(); });
         }
         if (!dataAvailablem) break; // Exit loop if writing is done
-        cout << "Main thread writing" << endl;
         write_to_csv(data_stored.back());
         dataAvailablem = false;
         if (!writing.load()) break;
     }
-    cout << "Main thread finished" << endl;
 
 //Joining all threads
     readerThread.join();
     inputThread.join();
     writerThread.join();
-    cout << "All threads joined!:)" << endl;
+    cout << "All threads joined, program successfully finished! :)" << endl;
     return 0;
 }

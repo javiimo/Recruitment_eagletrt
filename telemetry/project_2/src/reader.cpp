@@ -32,6 +32,7 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
     bool running=false;
     if(open_worked==0){
         std::cout << "Can oppened correctly" << std::endl;
+        std::cout << "IDLE STATE!" << std::endl;
     }else{
         std::cout << "Error opening the can" << std::endl;
         return;
@@ -44,33 +45,30 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
             // Check if it is a Start message
             if(std::string(message) == "0A0#6601" || std::string(message) == "0A0#FF01"){
                 running=true;
-                std::cout << "RUNNING!" << std::endl;
+                std::cout << "RUNNING STATE!" << std::endl;
                 if (!message_session.empty()){
                     dLock.lock();
                     data_stored.push_back(message_session);
                     dLock.unlock();
                     message_session.clear();
-                    std::cout << "Emptied vector and added, calling writer" << std::endl;
                     }
             }
 
             //Check if it is a Stop message
             if(std::string(message) == "0A0#66FF"){
                 running=false;
-                std::cout << "IDLE!" << std::endl;
+                std::cout << "IDLE STATE!" << std::endl;
                 if (!message_session.empty()){
                     dLock.lock();
                     data_stored.push_back(message_session);
                     dLock.unlock();
                     message_session.clear();
-                    std::cout << "Emptied vector and added" << std::endl;
                     // Call the writer and main threads to write the log and compute statistics of the last Runing Session.
                     std::unique_lock<std::mutex> lock(mtx);
                     dataAvailablew = true;
                     dataAvailablem = true;
                     lock.unlock();
                     cv.notify_all(); // Notify writer and main
-                    std::cout << "Called Writer" << std::endl;
                     }
             }
 
@@ -94,9 +92,7 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
     dLock.lock();
     data_stored.push_back(message_session);
     dLock.unlock();
-    std::cout << "Added the last vector of Messages to the deque" << std::endl;
     close_can();
-    std::cout << "CLOSED CAN" << std::endl;
 
     // Call writer one last time if the last session was running
     if(running==true){
@@ -104,9 +100,6 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
         dataAvailablew = true;
         dataAvailablem = true;
         lock.unlock();
-        cv.notify_all(); // Notify writer and main
-        writing.store(false);
-        std::cout << "Called Writer LAST TIME" << std::endl;
     }
     cv.notify_all(); // Notify writer and main to prevent deadlocks
     writing.store(false);
