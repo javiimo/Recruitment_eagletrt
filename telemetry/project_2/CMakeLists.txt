@@ -7,12 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O0 -g -w")
 
-# Set the C++ compiler (g++.exe) path 
-#set(CMAKE_CXX_COMPILER "C:/MinGW/bin/g++.exe")
-
-# Set the C compiler (gcc.exe) path
-#set(CMAKE_C_COMPILER "C:/MinGW/bin/gcc.exe")
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -48,13 +42,3 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(project_2 ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 target_link_libraries(project_2 ${PROJECT_NAME} stdc++fs)
 
-
-
-
-# Without creating the library:
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-# add_executable(project_2
-#     src/main.cpp
-#     src/reader.cpp
-#     src/fake_receiver.c
-# )
