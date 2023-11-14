@@ -14,7 +14,7 @@
 
 
 
-// Define writer variables
+// Define extern variables for syncrhronization of threads
 std::mutex mtx;
 std::condition_variable cv;
 bool dataAvailablew = false;
@@ -25,7 +25,7 @@ bool dataAvailablem = false;
 
 
 void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath,std::atomic<bool>& stop_flag, std::atomic<bool>& writing, std::mutex& dLock){
-    // Declare message, vector of message session, open the file for CAN and set vector as non-written
+    // Declare message, vector of message session, open the file for CAN and start in IDLE state
     char message[MAX_CAN_MESSAGE_SIZE];
     std::vector<TMessage> message_session;
     int open_worked=open_can(filepath);

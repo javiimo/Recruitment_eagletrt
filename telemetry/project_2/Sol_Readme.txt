@@ -7,5 +7,6 @@ I have also commented out the line from the CMakeLists.txt that sets the .exe in
 
 How are statistics done: Once the reader has finished receiving the messages of a Running session, it signals to the Main thread to compute the statistics of that Running session (it also signals if the session is interrupted by the user).
 For the mean_time, it is calculated taking the difference between the first and last time a certain ID was received during that running session and divided by the number of times that ID was received.
+In case there is only one message with that ID (for example, the start message), then the mean_time is the total time that session lasted (in miliseconds).
 
 Both the statistics csv and the logs are saved to a subfolder called Generated in the program's path.

@@ -27,7 +27,7 @@ void write_last_vector_to_file(const std::deque<std::vector<TMessage>>& data_sto
     file_path_stream << "Generated/Session" << first_timestamp << ".log";
     std::string file_path = file_path_stream.str();
 
-    // Open a file with the generated path for writing
+    // Open a file for writing
     std::ofstream out_file(file_path);
     if (!out_file.is_open()) {
         std::cout << "Could not open the file in " << file_path << std::endl;
@@ -48,11 +48,11 @@ void write_last_vector_to_file(const std::deque<std::vector<TMessage>>& data_sto
 
 void writer(std::deque<std::vector<TMessage>>& data_stored, std::atomic<bool>& writing){
     while(true){
-        {//Release the lock immediately after waking up
+        {//Release the lock inmediately after waking up
             std::unique_lock<std::mutex> lock(mtx);
             cv.wait(lock, [&]{ return dataAvailablew || !writing.load(); });
         }
-        if (!dataAvailablew) break;
+        if (!dataAvailablew) break; // Exit the loop it there is anything to write
         write_last_vector_to_file(data_stored);
         dataAvailablew = false;
         if (!writing.load()) break; // Exit loop if writing is done
