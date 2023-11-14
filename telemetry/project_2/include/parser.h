@@ -35,10 +35,11 @@ struct Message {
 
     // Function to convert the message to a string
     std::string toString() const {
-        std::stringstream ss;
-        ss << std::hex << id;
-        return ss.str() + '#' + payload;
-    }
+    std::stringstream ss;
+    ss << std::uppercase << std::hex << std::setfill('0') << std::setw(3) << id;
+    return ss.str() + '#' + payload;
+}
+
 };
 
 struct TMessage {
