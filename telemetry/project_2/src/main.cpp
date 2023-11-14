@@ -64,14 +64,17 @@ int main(int argc, char* argv[]){
     
     //Compute some basic statistics
     cout << "Main thread started" << endl;
-    while(writing.load()) {
+    while(true) {
         cout << "Main thread waits" << endl;
         {
             unique_lock<mutex> lock(mtx);
-            cv.wait(lock, []{ return dataAvailablem; });
+            cv.wait(lock, [&]{ return dataAvailablem || !writing.load(); });
         }
+        if (!dataAvailablem) break; // Exit loop if writing is done
+        cout << "Main thread writing" << endl;
         write_to_csv(data_stored.back());
         dataAvailablem = false;
+        if (!writing.load()) break;
     }
     cout << "Main thread finished" << endl;
 
@@ -79,5 +82,6 @@ int main(int argc, char* argv[]){
     readerThread.join();
     inputThread.join();
     writerThread.join();
+    cout << "All threads joined!:)" << endl;
     return 0;
 }

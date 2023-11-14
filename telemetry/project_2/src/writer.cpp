@@ -48,14 +48,17 @@ void write_last_vector_to_file(const std::deque<std::vector<TMessage>>& data_sto
 
 void writer(std::deque<std::vector<TMessage>>& data_stored, std::atomic<bool>& writing){
     std::cout << "Writer started" << std::endl;
-    while(writing.load()){
+    while(true){
             std::cout << "Writer waits" << std::endl;
-        {
+        {//Release the lock immediately after waking up
             std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, []{ return dataAvailablew; });
-        }//Release the lock immediately after waking up
+            cv.wait(lock, [&]{ return dataAvailablew || !writing.load(); });
+        }
+        if (!dataAvailablew) break;
+        std::cout << "Writer writing" << std::endl;
         write_last_vector_to_file(data_stored);
         dataAvailablew = false;
+        if (!writing.load()) break; // Exit loop if writing is done
     }
     std::cout << "Writer finished" << std::endl;
     return;

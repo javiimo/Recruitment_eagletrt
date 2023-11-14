@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <ctime>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <filesystem>
@@ -83,7 +84,9 @@ void write_to_csv(const std::vector<TMessage>& messages) {
 
     // Write data
     for (const auto& pair : id_infos) {
-        file << pair.first << "," 
+        std::stringstream ss;
+        ss << std::uppercase << std::hex << std::setfill('0') << std::setw(3) << pair.first;
+        file << ss.str() << "," 
              << pair.second.count << "," 
              << pair.second.last_timestamp << "\n";
     }

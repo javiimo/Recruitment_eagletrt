@@ -108,6 +108,7 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
         writing.store(false);
         std::cout << "Called Writer LAST TIME" << std::endl;
     }
-
+    cv.notify_all(); // Notify writer and main to prevent deadlocks
+    writing.store(false);
     return;
 }
