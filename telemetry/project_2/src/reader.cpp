@@ -17,7 +17,8 @@
 // Define writer variables
 std::mutex mtx;
 std::condition_variable cv;
-bool dataAvailable = false;
+bool dataAvailablew = false;
+bool dataAvailablem = false;
 
 
 
@@ -63,11 +64,12 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
                     dLock.unlock();
                     message_session.clear();
                     std::cout << "Emptied vector and added" << std::endl;
-                    // Call the writer thread to write the log of the last Runing Session.
+                    // Call the writer and main threads to write the log and compute statistics of the last Runing Session.
                     std::unique_lock<std::mutex> lock(mtx);
-                    dataAvailable = true;
+                    dataAvailablew = true;
+                    dataAvailablem = true;
                     lock.unlock();
-                    cv.notify_one(); // Notify writer
+                    cv.notify_all(); // Notify writer and main
                     std::cout << "Called Writer" << std::endl;
                     }
             }
@@ -99,9 +101,10 @@ void reader(std::deque<std::vector<TMessage>>& data_stored, const char* filepath
     // Call writer one last time if the last session was running
     if(running==true){
         std::unique_lock<std::mutex> lock(mtx);
-        dataAvailable = true;
+        dataAvailablew = true;
+        dataAvailablem = true;
         lock.unlock();
-        cv.notify_one(); // Notify writer
+        cv.notify_all(); // Notify writer and main
         writing.store(false);
         std::cout << "Called Writer LAST TIME" << std::endl;
     }

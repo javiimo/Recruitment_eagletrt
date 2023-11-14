@@ -23,6 +23,7 @@ set(SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fake_receiver.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/reader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/writer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/statistics.cpp
 )
 
 #Compile every source file as C++
@@ -38,13 +39,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 # Add any other libraries you need to link against here
 target_link_libraries(${PROJECT_NAME}
     #Other libs
-    #stdc++fs
 )
-
-#For using filsystem header from STD
-# target_link_libraries(project_2 stdc++fs)
-
-
 
 # Set the output directory for the executable
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

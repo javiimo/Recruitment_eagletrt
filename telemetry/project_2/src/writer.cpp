@@ -1,4 +1,5 @@
 #include "../include/writer.h"
+#include "../include/reader.h"
 #include "../include/parser.h"
 #include <atomic>
 #include <mutex>
@@ -20,16 +21,10 @@ void write_last_vector_to_file(const std::deque<std::vector<TMessage>>& data_sto
     // Access the last vector in the deque
     const std::vector<TMessage>& last_vector = data_stored.back();
 
-    // Check and create the 'Generated' directory if it doesn't exist
-    std::filesystem::path directory_path = "Generated";
-    if (!std::filesystem::exists(directory_path)) {
-        std::filesystem::create_directory(directory_path);
-    }
-
-    // Generate the file path including the 'Generated' folder
+    // Generate the file path in the 'Generated' folder
     std::time_t first_timestamp = last_vector.front().timestamp;
     std::stringstream file_path_stream;
-    file_path_stream << directory_path.string() << "/Session" << first_timestamp << ".log";
+    file_path_stream << "Generated/Session" << first_timestamp << ".log";
     std::string file_path = file_path_stream.str();
 
     // Open a file with the generated path for writing
@@ -54,11 +49,13 @@ void write_last_vector_to_file(const std::deque<std::vector<TMessage>>& data_sto
 void writer(std::deque<std::vector<TMessage>>& data_stored, std::atomic<bool>& writing){
     std::cout << "Writer started" << std::endl;
     while(writing.load()){
-        std::cout << "Writer waits" << std::endl;
-        std::unique_lock<std::mutex> lock(mtx);
-        cv.wait(lock, []{ return dataAvailable; });
+            std::cout << "Writer waits" << std::endl;
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            cv.wait(lock, []{ return dataAvailablew; });
+        }//Release the lock immediately after waking up
         write_last_vector_to_file(data_stored);
-        dataAvailable = false;
+        dataAvailablew = false;
     }
     std::cout << "Writer finished" << std::endl;
     return;

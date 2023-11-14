@@ -3,6 +3,7 @@
 #include "../include/parser.h"
 #include "../include/reader.h"
 #include "../include/writer.h"
+#include "../include/statistics.h"
 #include <string>
 #include <deque>
 #include <vector>
@@ -11,7 +12,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <functional>
-
+#include <filesystem>
 
 using namespace std;
 
@@ -32,8 +33,13 @@ int main(int argc, char* argv[]){
 
     const char* path = argv[1];
     cout << "Welcome to Project 2" << endl;
-    cout << "Press any button to stop receiving info" << endl;
+    cout << "Press any key + ENTER to stop receiving info" << endl;
 
+    // Check and create the 'Generated' directory if it doesn't exist for storing all the output files
+    filesystem::path directory_path = "Generated";
+    if (!filesystem::exists(directory_path)) {
+        filesystem::create_directory(directory_path);
+    }
     
     // Start reader thread
     atomic<bool> stopr_flag(false);
@@ -56,9 +62,22 @@ int main(int argc, char* argv[]){
             }
         }});
     
-    cout << "Finished Main!!" << endl;
+    //Compute some basic statistics
+    cout << "Main thread started" << endl;
+    while(writing.load()) {
+        cout << "Main thread waits" << endl;
+        {
+            unique_lock<mutex> lock(mtx);
+            cv.wait(lock, []{ return dataAvailablem; });
+        }
+        write_to_csv(data_stored.back());
+        dataAvailablem = false;
+    }
+    cout << "Main thread finished" << endl;
+
+//Joining all threads
     readerThread.join();
-    writerThread.join();
     inputThread.join();
+    writerThread.join();
     return 0;
 }
