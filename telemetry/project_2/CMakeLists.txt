@@ -8,10 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -O0 -g -w")
 
 # Set the C++ compiler (g++.exe) path 
-set(CMAKE_CXX_COMPILER "C:/mingw64/bin/g++.exe")
+#set(CMAKE_CXX_COMPILER "C:/MinGW/bin/g++.exe")
 
 # Set the C compiler (gcc.exe) path
-set(CMAKE_C_COMPILER "C:/mingw64/bin/gcc.exe")
+#set(CMAKE_C_COMPILER "C:/MinGW/bin/gcc.exe")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -22,6 +22,7 @@ include_directories(
 set(SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fake_receiver.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/reader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/writer.cpp
 )
 
 #Compile every source file as C++
@@ -37,14 +38,20 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 # Add any other libraries you need to link against here
 target_link_libraries(${PROJECT_NAME}
     #Other libs
+    #stdc++fs
 )
+
+#For using filsystem header from STD
+# target_link_libraries(project_2 stdc++fs)
+
+
 
 # Set the output directory for the executable
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # Create the executable and link it against your library
 add_executable(project_2 ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
-target_link_libraries(project_2 ${PROJECT_NAME})
+target_link_libraries(project_2 ${PROJECT_NAME} stdc++fs)
 
 
 

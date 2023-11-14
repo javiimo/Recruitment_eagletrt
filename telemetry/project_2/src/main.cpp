@@ -2,23 +2,25 @@
 #include <iostream>
 #include "../include/parser.h"
 #include "../include/reader.h"
+#include "../include/writer.h"
 #include <string>
 #include <deque>
 #include <vector>
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <condition_variable>
 #include <functional>
+
 
 using namespace std;
 
-#include "include/reader.h"
 extern "C"{
-    #include "include/fake_receiver.h"
+    #include "../include/fake_receiver.h"
 }
 
 deque<vector<TMessage>> data_stored;
-mutex gLock;
+mutex dLock;
 
 
 int main(int argc, char* argv[]){
@@ -35,11 +37,11 @@ int main(int argc, char* argv[]){
     
     // Start reader thread
     atomic<bool> stopr_flag(false);
-    atomic<bool> writing(false);
-    thread readerThread(reader, ref(data_stored), path, ref(stopr_flag), ref(writing), ref(gLock));
+    atomic<bool> writing(true);
+    thread readerThread(reader, ref(data_stored), path, ref(stopr_flag), ref(writing), ref(dLock));
 
-    //Start a writer thread
-
+    //!Start a writer thread
+    thread writerThread(writer, ref(data_stored), ref(writing));
     // Start a thread to check input to stop reading
     // To stop the thread you would have to press a key and then press enter.
     thread inputThread([&stopr_flag]() {
@@ -56,6 +58,7 @@ int main(int argc, char* argv[]){
     
     cout << "Finished Main!!" << endl;
     readerThread.join();
+    writerThread.join();
     inputThread.join();
     return 0;
 }

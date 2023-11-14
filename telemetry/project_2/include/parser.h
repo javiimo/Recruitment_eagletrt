@@ -1,5 +1,4 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 #include <cstdint>
 #include <string>
 #include <chrono>
@@ -49,5 +48,3 @@ struct TMessage {
     TMessage(const Message& _message, const std::time_t& _timestamp)
         : message(_message), timestamp(_timestamp) {}
 };
-
-#endif
